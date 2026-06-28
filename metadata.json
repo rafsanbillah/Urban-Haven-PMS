@@ -1,0 +1,6 @@
+{
+  "name": "Urban Haven",
+  "description": "A comprehensive full-stack property management system for short-stay room rentals featuring multi-role access, real-time availability calendar, booking, check-in/out, payment tracking, housekeeping, and maintenance management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

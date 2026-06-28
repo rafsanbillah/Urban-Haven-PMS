@@ -1,0 +1,143 @@
+{
+  "collections": [
+    {
+      "name": "rooms",
+      "fields": [
+        { "name": "name", "type": "string" },
+        { "name": "type", "type": "string" },
+        { "name": "floor", "type": "number" },
+        { "name": "capacity", "type": "number" },
+        { "name": "description", "type": "string" },
+        { "name": "amenities", "type": "array" },
+        { "name": "baseRate", "type": "number" },
+        { "name": "weekendRate", "type": "number" },
+        { "name": "hourlyRate", "type": "number" },
+        { "name": "status", "type": "string" },
+        { "name": "housekeeperId", "type": "string", "optional": true },
+        { "name": "images", "type": "array", "optional": true },
+        { "name": "airbnbImportUrl", "type": "string", "optional": true },
+        { "name": "isApartment", "type": "boolean", "optional": true },
+        { "name": "parentId", "type": "string", "optional": true },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    },
+    {
+      "name": "bookings",
+      "fields": [
+        { "name": "roomId", "type": "string" },
+        { "name": "guestId", "type": "string" },
+        { "name": "guestName", "type": "string" },
+        { "name": "guestPhone", "type": "string" },
+        { "name": "guestEmail", "type": "string" },
+        { "name": "checkInDate", "type": "string" },
+        { "name": "checkOutDate", "type": "string" },
+        { "name": "checkInTime", "type": "string", "optional": true },
+        { "name": "checkOutTime", "type": "string", "optional": true },
+        { "name": "status", "type": "string" },
+        { "name": "type", "type": "string" },
+        { "name": "totalAmount", "type": "number" },
+        { "name": "paidAmount", "type": "number" },
+        { "name": "notes", "type": "string", "optional": true },
+        { "name": "source", "type": "string" },
+        { "name": "agentName", "type": "string", "optional": true },
+        { "name": "payments", "type": "array" },
+        { "name": "timeline", "type": "array" },
+        { "name": "identityVerified", "type": "boolean" },
+        { "name": "documents", "type": "array" },
+        { "name": "createdAt", "type": "string" },
+        { "name": "googleEventId", "type": "string", "optional": true },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    },
+    {
+      "name": "guests",
+      "fields": [
+        { "name": "name", "type": "string" },
+        { "name": "phone", "type": "string" },
+        { "name": "email", "type": "string" },
+        { "name": "idNumber", "type": "string", "optional": true },
+        { "name": "nationality", "type": "string" },
+        { "name": "address", "type": "string", "optional": true },
+        { "name": "tag", "type": "string" },
+        { "name": "notes", "type": "string", "optional": true },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    },
+    {
+      "name": "housekeepingTasks",
+      "fields": [
+        { "name": "roomId", "type": "string" },
+        { "name": "type", "type": "string" },
+        { "name": "status", "type": "string" },
+        { "name": "assignedTo", "type": "string", "optional": true },
+        { "name": "priority", "type": "string" },
+        { "name": "notes", "type": "string", "optional": true },
+        { "name": "photoUrl", "type": "string", "optional": true },
+        { "name": "timestamp", "type": "string" },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    },
+    {
+      "name": "maintenanceRequests",
+      "fields": [
+        { "name": "roomId", "type": "string" },
+        { "name": "category", "type": "string" },
+        { "name": "priority", "type": "string" },
+        { "name": "status", "type": "string" },
+        { "name": "description", "type": "string" },
+        { "name": "photoUrl", "type": "string", "optional": true },
+        { "name": "assignedTo", "type": "string", "optional": true },
+        { "name": "notes", "type": "string", "optional": true },
+        { "name": "createdAt", "type": "string" },
+        { "name": "resolvedAt", "type": "string", "optional": true },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "fields": [
+        { "name": "name", "type": "string" },
+        { "name": "email", "type": "string" },
+        { "name": "role", "type": "string" },
+        { "name": "createdAt", "type": "string" },
+        { "name": "tenantId", "type": "string", "optional": true }
+      ],
+      "rules": [
+        {
+          "allow": ["read", "write"],
+          "condition": "request.auth != null"
+        }
+      ]
+    }
+  ]
+}
