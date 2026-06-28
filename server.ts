@@ -8,7 +8,6 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
 import { AppState, Booking, BookingStatus, BookingType, RoomStatus, RoomCategory, UserRole } from "./src/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "urban-haven-secret-key-pms-2026-06-24";
@@ -276,31 +275,6 @@ function writeState(state: AppState) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(state, null, 2), "utf-8");
   } catch (err) {
     console.error("Error writing to data.json", err);
-  }
-}
-
-// Lazy load Gemini API
-let aiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI | null {
-  if (aiClient) return aiClient;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-    console.log("No valid GEMINI_API_KEY found, Gemini intelligence features will run in high-quality simulation mode.");
-    return null;
-  }
-  try {
-    aiClient = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        },
-      },
-    });
-    return aiClient;
-  } catch (err) {
-    console.error("Failed to initialize GoogleGenAI client", err);
-    return null;
   }
 }
 
@@ -2082,54 +2056,6 @@ async function startServer() {
       reports
     });
   });
-
-  // Intelligent Gemini Dynamic Pricing & Operations Assistant
-  app.post("/api/gemini/price-recommendation", express.json(), async (req, res) => {
-    const ai = getGeminiClient();
-    const summaryContext = req.body.summaryContext;
-
-    if (ai) {
-      try {
-        const prompt = `You are the Urban Haven AI Pricing and operations assistant.
-Analyze the following property management snapshot and generate 3-4 specific, actionable, bulleted recommendations (using simple Markdown syntax).
-Keep each bullet concise and direct. Focus on:
-1. Dynamic pricing strategy (raising standard prices during high occupancy or offering discount rules for slow nights)
-2. Immediate operations action (cleaning backlogs, urgent maintenance tasks)
-3. Room category recommendations (e.g. upselling standard booking to executive suites)
-
-Property Snapshot:
-${JSON.stringify(summaryContext, null, 2)}
-
-Provide the output strictly in markdown, styled beautifully.`;
-
-        const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: prompt,
-        });
-
-        res.json({ recommendation: response.text || "No recommendations generated." });
-      } catch (err) {
-        console.error("Gemini API error", err);
-        res.json({ recommendation: getLocalHeuristicsRecommendation(summaryContext) });
-      }
-    } else {
-      // Return beautiful simulated recommendations based on heuristics
-      res.json({ recommendation: getLocalHeuristicsRecommendation(summaryContext) });
-    }
-  });
-
-  // Local rule-based recommendation engine (Fallback)
-  function getLocalHeuristicsRecommendation(context: any): string {
-    const lines = [
-      `### 💡 Urban Haven AI Heuristic Recommendations`,
-      `*Heuristic fallback engine active (No live Gemini API key detected)*\n`,
-      `* **Dynamic Surcharges Proposed**: Occupancy is at **${context.occupancyRate}**. Since occupancy is healthy, we recommend a temporary **8% price lift** on weekend bookings for standard rooms (Rooms 101, 102, 103) to maximize revenue yield.`,
-      `* **Housekeeping Cleanup Needed**: You have **${context.dirtyRooms} dirty rooms** pending checkout preparation. Prioritize assigning housekeeper Karim to Room 102 to make it active for check-in.`,
-      `* **Preventive Maintenance Urgencies**: There are **${context.maintenanceCount} unresolved maintenance issues** (Room 302 AC compressor). AC issues in high-tier suite 302 block booking revenue; authorize external vendor inspection immediately.`,
-      `* **Upselling Executive Slots**: Suggest standard-tier guests checking in within 24 hours to upgrade to Executive Suite 201 for a discount of only +$25/night to clear premium vacancy.`
-    ];
-    return lines.join("\n");
-  }
 
   // Vite server middleware configuration
   if (process.env.NODE_ENV !== "production") {

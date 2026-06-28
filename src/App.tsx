@@ -335,31 +335,6 @@ export default function App() {
     };
   };
 
-  // Trigger Gemini API price recommendation helper
-  const handleTriggerAIInsights = async (): Promise<string> => {
-    const roomCount = appState?.rooms.length || 0;
-    const activeBookings = appState?.bookings.filter(b => b.status === BookingStatus.CHECKED_IN || b.status === BookingStatus.CONFIRMED) || [];
-    const occupancyRate = roomCount > 0 ? Math.round((activeBookings.length / roomCount) * 100) : 0;
-    
-    const summaryContext = {
-      occupancyRate: `${occupancyRate}%`,
-      totalRooms: roomCount,
-      activeBookings: activeBookings.length,
-      roomsList: appState?.rooms.map(r => ({ id: r.id, type: r.type, status: r.status, baseRate: r.baseRate })) || [],
-      maintenanceCount: appState?.maintenanceRequests.filter(m => m.status !== "Closed" && m.status !== "Resolved").length || 0,
-      dirtyRooms: appState?.rooms.filter(r => r.status === RoomStatus.DIRTY).length || 0,
-    };
-
-    const res = await fetch("/api/gemini/price-recommendation", { 
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summaryContext })
-    });
-    if (!res.ok) throw new Error("Gemini AI offline");
-    const data = await res.json();
-    return data.recommendation;
-  };
-
   // Update CRM guest details
   const handleUpdateGuest = async (updatedGuest: GuestProfile) => {
     const guestRef = doc(db, "guests", updatedGuest.id);
@@ -662,7 +637,6 @@ export default function App() {
               activeRole={activeRole}
               onCheckIn={handleCheckIn}
               onCheckOut={handleCheckOut}
-              onTriggerAIInsights={handleTriggerAIInsights}
               onBookRoom={(roomId, checkIn, checkOut) => {
                 setPrefilledRoomId(roomId);
                 setPrefilledStart(checkIn);

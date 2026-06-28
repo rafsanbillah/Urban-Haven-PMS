@@ -16,7 +16,6 @@ interface DashboardOverviewProps {
   activeRole: UserRole;
   onCheckIn: (bookingId: string) => Promise<void>;
   onCheckOut: (bookingId: string, lateFee: number, notes: string) => Promise<void>;
-  onTriggerAIInsights: () => Promise<string>;
   onBookRoom: (roomId: string, checkInDate: string, checkOutDate: string) => void;
 }
 
@@ -25,30 +24,12 @@ export default function DashboardOverview({
   activeRole,
   onCheckIn,
   onCheckOut,
-  onTriggerAIInsights,
   onBookRoom
 }: DashboardOverviewProps) {
-  const [aiInsights, setAiInsights] = useState("");
-  const [loadingAI, setLoadingAI] = useState(false);
-
   // Late checkout modal state
   const [checkoutTarget, setCheckoutTarget] = useState<Booking | null>(null);
   const [lateFee, setLateFee] = useState("0");
   const [checkoutNotes, setCheckoutNotes] = useState("");
-
-  const handleFetchAI = async () => {
-    setLoadingAI(true);
-    setAiInsights("");
-    try {
-      const insights = await onTriggerAIInsights();
-      setAiInsights(insights);
-    } catch (err) {
-      console.error(err);
-      setAiInsights("Failed to load recommendations.");
-    } finally {
-      setLoadingAI(false);
-    }
-  };
 
   // KPI Calculations
   const roomCount = state.rooms.length;
@@ -277,11 +258,11 @@ export default function DashboardOverview({
       {/* Unit Availability Search & Hourly Visualizer Scheduling grid */}
       <AvailabilitySearchAndHourlyChart state={state} onBookRoom={onBookRoom} />
 
-      {/* Main Grid: Left Arrivals/Departures, Right AI recommendations */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Section */}
+      <div>
         
         {/* Left: Active Checkin / Checkout Operational queues */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -362,44 +343,6 @@ export default function DashboardOverview({
                 })
             )}
           </div>
-        </div>
-
-        {/* Right: AI Assistant Dynamic Pricing Recommendation Panel */}
-        <div className="bg-slate-900 text-white p-6 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <h3 className="text-sm font-black flex items-center gap-2">
-              <Brain className="w-5 h-5 text-indigo-400 animate-pulse" />
-              Urban Haven AI Assistant
-            </h3>
-            <p className="text-xs text-slate-450 mt-1.5">
-              Audits room occupancy metrics & leverages Gemini models for dynamic weekend surcharge recommendations.
-            </p>
-
-            {/* AI Response Display box */}
-            <div className="mt-4 bg-slate-950 rounded-xl p-4 border border-slate-800 min-h-48 text-[11px] text-slate-300 font-medium leading-relaxed overflow-y-auto">
-              {aiInsights ? (
-                <div className="space-y-2">
-                  <div className="prose prose-invert prose-xs">
-                    {aiInsights.split("\n").map((line, idx) => (
-                      <p key={idx}>{line}</p>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-slate-550 italic text-center py-12">
-                  Click 'Generate Recommendations' below to trigger server-side Gemini analysis.
-                </p>
-              )}
-            </div>
-          </div>
-
-          <button
-            onClick={handleFetchAI}
-            disabled={loadingAI}
-            className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold text-xs rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            {loadingAI ? "Consulting Gemini..." : "Generate AI Insights"}
-          </button>
         </div>
 
       </div>
